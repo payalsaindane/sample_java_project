@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    tools { 
+      maven 'maven' 
+      jdk 'jdk'
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn -f ./simple-java-maven-app/pom.xml clean compile'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn -f ./simple-java-maven-app/pom.xml test'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults:'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('Deliver') {
+            steps {
+                sh './simple-java-maven-app/jenkins/scripts/deliver.sh'
+            }
+        }
+    }
+}
